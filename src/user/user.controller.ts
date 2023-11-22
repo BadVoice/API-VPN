@@ -39,4 +39,13 @@ export class UserController {
       return r
     });
   }
+
+  @Get(':userId/email')
+  getUserEmail(@Param('userId') userId: string) {
+    return this.userService.getUserEmailById(userId)
+    .then(r => {
+      if(!r) throw new NotFoundException('User not found');
+      return r
+    });
+  }
 }
