@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -83,10 +83,19 @@ export class UserService {
     })
   }
 
-  remove(id: string) {
+  async remove(userId: string) {
+
+    await this.prisma.userProfile.delete({
+      where: {
+        id: userId
+      }
+    })
+
     return this.prisma.user.delete({
-      where: { id },
-      select: {
+      where: {
+        id: userId
+      },
+      select: {  
         id: true,
         firstName: true,
         lastName: true,
@@ -96,9 +105,13 @@ export class UserService {
         profile: true,
         updatedAt: true,
         createdAt: true,
-      }
-    })
+      },
+    }).then(r => {
+      if(!r) throw new NotFoundException('User not found');
+      return r
+    });
   }
+  
 
   private async hashedPassword(password: string): Promise<string>  {
     const salt = await bcrypt.genSalt();
