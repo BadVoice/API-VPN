@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, B
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
 
 @Controller('users')
 export class UserController {
@@ -43,6 +45,25 @@ export class UserController {
   @Get(':userId/email')
   getUserEmail(@Param('userId') userId: string) {
     return this.userService.getUserEmailById(userId)
+    .then(r => {
+      if(!r) throw new NotFoundException('User not found');
+      return r
+    });
+  }
+
+  @Get('profiles/:userId')
+  getProfileByUserId(@Param('userId') userId: string) {
+    return this.userService.getProfileByUserId(userId)
+    .then(r => {
+      if(!r) throw new NotFoundException('User not found');
+      return r
+    });
+  }
+
+  @Patch('profiles/:userId')
+  updateProfile(@Param('userId') userId: string,  
+  @Body() dto: UpdateProfileDto) {
+    return this.userService.updateProfile(userId, dto)
     .then(r => {
       if(!r) throw new NotFoundException('User not found');
       return r

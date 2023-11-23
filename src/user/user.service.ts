@@ -5,6 +5,8 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { DatabaseService } from 'src/database/database.service';
 import { EmailService } from 'src/email/email.service';
 import * as bcrypt from 'bcrypt';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -157,4 +159,54 @@ export class UserService {
     }
     if(!user) throw new NotFoundException('User not found');
   }
+
+  async getProfileByUserId(userId: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        profile: true
+      }
+    })
+    .catch(error => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2023') {
+          throw new NotFoundException("User id not found");
+        }
+      }
+      return error
+    });
+  }
+
+  updateProfile(userId: string, dto: UpdateProfileDto) {
+
+    return this.prisma.$transaction(async (prisma) => {
+      return prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          ...dto,
+          profile: {
+            update: {
+              ...dto
+            }
+          }
+        },
+        select: {
+          profile: true
+        }
+      });
+    })
+    .catch(error => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2023') {
+          throw new NotFoundException("User id not found");
+        }
+      }
+      return error
+    });
+  }
+
 }
