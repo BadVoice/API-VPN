@@ -126,8 +126,8 @@ export class UserService {
       }
     })
     if (user) {
-      const decryptedEmail = this.emailService.decryptEmail(user.email);
-      return {decryptedEmail};
+      const encryptedEmail = this.emailService.encryptEmail(user.email);
+      return {encryptedEmail};
     }
     if(!user) throw new NotFoundException('User not found');
   }
