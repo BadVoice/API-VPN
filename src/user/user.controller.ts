@@ -8,8 +8,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto)
+  create(@Body() userDto: CreateUserDto) {
+    return this.userService.createUserWithProfile(userDto)
   }
 
   @Get()
@@ -33,7 +33,7 @@ export class UserController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(id)
+    return this.userService.deleteUserAndProfile(id)
     .then(r => {
       if(!r) throw new NotFoundException('User not found');
       return r

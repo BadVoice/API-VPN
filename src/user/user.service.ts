@@ -13,29 +13,33 @@ export class UserService {
     private readonly emailService: EmailService
     ) {}
   
-  async create(dto: CreateUserDto) {
-    const hashedPassword = await this.hashedPassword(dto.password)
+  async createUserWithProfile(userDto: CreateUserDto) {
+    const hashedPassword = await this.hashedPassword(userDto.password)
     return this.prisma.user.create({
       data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
-        password: hashedPassword,
-        role: dto.role,
-        profile: {
-            create: {},
+          firstName: userDto.firstName,
+          lastName: userDto.lastName,
+          email: userDto.email,
+          password: hashedPassword,
+          role: userDto.role,
+          profile: {
+            create: {
+              lastName: userDto.lastName,
+              firstName: userDto.firstName
+            }
+          },
         },
-    },
-    select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        emailConfirmed: true,
-        profile: true,
-        updatedAt: true,
-        createdAt: true,
-    },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          imgUrl: true,
+          role: true,
+          emailConfirmed: true,
+          profile: true,
+          updatedAt: true,
+          createdAt: true,
+        }
     })
     .catch(error => {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -48,9 +52,14 @@ export class UserService {
   }
 
   findAll() {
-    return this.prisma.user.findMany()
+    return this.prisma.user.findMany({
+      include: {
+        profile: true
+      }
+    })
     .then(e => e.map(({ password, email, ...rest }) => rest))
-    .catch((error) => console.error(error));
+    .catch((error) => console.error(error))
+
   }
 
   findOne(id: string) {
@@ -68,44 +77,61 @@ export class UserService {
       }})
   }
 
-  update(id: string, dto: UpdateUserDto) {
-    return this.prisma.user.update({where: { id }, 
-      data: dto,
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        emailConfirmed: true,
-        profile: true,
-        updatedAt: true,
-        createdAt: true,
-      }
+  update(userId: string, userData: UpdateUserDto) {
+
+    return this.prisma.$transaction(async (prisma) => {
+      return prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          ...userData,
+          profile: {
+            update: {
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              imgUrl: userData.imgUrl
+            }
+          }
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          emailConfirmed: true,
+          profile: true,
+          updatedAt: true,
+          createdAt: true,
+        }
+      });
     })
   }
 
-  async remove(userId: string) {
+  async deleteUserAndProfile(userId: string) {
+    return this.prisma.$transaction(async (prisma) => {
 
-    await this.prisma.userProfile.delete({
-      where: {
-        id: userId
-      }
-    })
+      await prisma.userProfile.delete({
+        where: {
+          userId
+        }
+      });
 
-    return this.prisma.user.delete({
-      where: {
-        id: userId
-      },
-      select: {  
-        id: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        emailConfirmed: true,
-        profile: true,
-        updatedAt: true,
-        createdAt: true,
-      },
+      return prisma.user.delete({
+        where: {
+          id: userId
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          emailConfirmed: true,
+          profile: true,
+          updatedAt: true,
+          createdAt: true,
+        }
+      });
     }).then(r => {
       if(!r) throw new NotFoundException('User not found');
       return r
