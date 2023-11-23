@@ -14,13 +14,12 @@ export class UserService {
     ) {}
   
   async create(dto: CreateUserDto) {
-    const encryptedEmail = this.emailService.encryptEmail(dto.email);
     const hashedPassword = await this.hashedPassword(dto.password)
     return this.prisma.user.create({
       data: {
         firstName: dto.firstName,
         lastName: dto.lastName,
-        email: encryptedEmail,
+        email: dto.email,
         password: hashedPassword,
         role: dto.role,
         profile: {
