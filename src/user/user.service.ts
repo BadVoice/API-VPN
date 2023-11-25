@@ -24,6 +24,7 @@ export class UserService {
           email: userDto.email,
           password: hashedPassword,
           role: userDto.role,
+          imgUrl: userDto.imgUrl = "default.png",
           profile: {
             create: {
               lastName: userDto.lastName,
@@ -72,6 +73,7 @@ export class UserService {
         firstName: true,
         lastName: true,
         role: true,
+        imgUrl: true,
         emailConfirmed: true,
         profile: true,
         updatedAt: true,

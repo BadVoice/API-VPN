@@ -28,8 +28,9 @@ export class CreateUserDto {
 
     @IsString()
     @IsOptional()
-    imgUrl?: string
+    imgUrl?: string;
 
     @IsEnum(Role)
-    role: Role
+    @IsOptional()
+    role?: Role = Role.USER;
 }

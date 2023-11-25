@@ -9,7 +9,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post("/register")
   create(@Body() userDto: CreateUserDto) {
     return this.userService.createUserWithProfile(userDto)
   }
