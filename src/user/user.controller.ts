@@ -1,18 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, BadRequestException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { CreateProfileDto } from './dto/create-profile.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post("/register")
-  create(@Body() userDto: CreateUserDto) {
-    return this.userService.createUserWithProfile(userDto)
-  }
 
   @Get()
   findAll() {
