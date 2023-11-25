@@ -14,6 +14,24 @@ export class UserService {
     private readonly prisma: DatabaseService,
     private readonly emailService: EmailService
     ) {}
+
+    async login(email: string, pass: string) {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email
+        }
+      })
+  
+      if(!user) return null
+  
+      const isPasswordValid = await bcrypt.compare(pass, user.password);
+  
+      if(isPasswordValid) {
+        return user
+      } else {
+        return null
+      }
+    }
   
   async createUserWithProfile(userDto: CreateUserDto) {
     const hashedPassword = await this.hashedPassword(userDto.password)
