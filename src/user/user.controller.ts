@@ -3,9 +3,13 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/roles.enum';
 
 @Controller('users')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(Role.Admin)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -56,6 +60,7 @@ export class UserController {
   }
 
   @Patch('profiles/:userId')
+  @Roles(Role.User)
   updateProfile(@Param('userId') userId: string,  
   @Body() dto: UpdateProfileDto) {
     return this.userService.updateProfile(userId, dto)
