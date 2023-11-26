@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, NotFoundException, ForbiddenException,} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/create-auth.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -22,7 +22,13 @@ export class AuthController {
 
     @Post("/register")
     create(@Body() userDto: CreateUserDto) {
-      return this.userService.createUserWithProfile(userDto)
-    }
+      const userRole = userDto.role;
 
+      if (userRole !== 'ADMIN') {
+        return this.userService.createUserWithProfile(userDto)
+      } else {
+        throw new ForbiddenException('You cannot register a user with the ADMIN role');
+      }
+    }
 }
+
