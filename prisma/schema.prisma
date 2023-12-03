@@ -41,3 +41,13 @@ model UserProfile {
   subscribeExpire String? @map("subscribe_exp")
   @@map("profiles")
 }
+
+model AccessKey {
+  modelId String @id @default(uuid())  
+  id  String @unique 
+  name String
+  password String
+  port Int
+  method String
+  accessUrl String
+}

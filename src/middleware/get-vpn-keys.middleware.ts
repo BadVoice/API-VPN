@@ -1,5 +1,3 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
 
 const axios = require('axios').create({
     httpsAgent: new (require('https')).Agent({  
@@ -7,32 +5,44 @@ const axios = require('axios').create({
     }),
   }); // for developer version, dont forgot remove this after deploy
 
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
+import { KeysService } from 'src/keys/keys.service';
 
 @Injectable()
-export class getVpnKeysMiddleware implements NestMiddleware {
-    constructor(private configService: ConfigService) {}
+export class TrackingService {
+    private readonly logger = new Logger(TrackingService.name);
+    constructor(
+        private accessKeysService: KeysService,
+        private configService: ConfigService) 
+    {}
 
-    use(req: Request, res: Response, next: () => void) {
+    async getAccessKeys() {
+      try {
         const getKeysFromOutlineApi = this.configService.get('GET_KEYS_OUTLINE_URL');
-        axios.get(getKeysFromOutlineApi)
-        .then((response) => {
+        const response = await axios.get(getKeysFromOutlineApi);
         const processedData = processData(response.data);
-        res.locals.data = processedData;
-        next();
-    })
-        .catch((error) => {
-        console.error(error);
-        next();
-    });
+        const accessKeyDto = processedData
+  
+        await this.accessKeysService.create(accessKeyDto);
+      } catch (error) {
+        console.error('Error while requesting data:', error);
+      }
     }
-}
-
-function processData(data: any) {
+  
+    @Cron(CronExpression.EVERY_MINUTE)
+    async handleCron() {
+      this.logger.debug('Called every minute');
+      await this.getAccessKeys();
+    }
+  }
+  
+  function processData(data: any) {
     if (!data.accessKeys || !Array.isArray(data.accessKeys)) {
-        console.error('Data should have an array property accessKeys:', data);
-        return [];
+      console.error('Data should have an array property accessKeys:', data);
+      return [];
     }
-
-    return data.accessKeys
-}
+    return data.accessKeys;
+  }
+  
