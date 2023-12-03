@@ -26,10 +26,20 @@ export class TrackingService {
         const accessKeyDto = processedData
   
         await this.accessKeysService.create(accessKeyDto);
+        await this.removeOldAccessKeys(processedData);
       } catch (error) {
         console.error('Error while requesting data:', error);
       }
     }
+
+    async removeOldAccessKeys(newData: any[]) {
+        const existingKeys = await this.accessKeysService.findAll();
+        const existingIds = existingKeys.map(key => key.id);
+        
+        const keysToDelete = existingIds.filter(id => !newData.find(key => key.id === id));
+        
+        await Promise.all(keysToDelete.map(id => this.accessKeysService.deleteKey(id)));
+      }
   
     @Cron(CronExpression.EVERY_MINUTE)
     async handleCron() {
@@ -45,4 +55,5 @@ export class TrackingService {
     }
     return data.accessKeys;
   }
+
   

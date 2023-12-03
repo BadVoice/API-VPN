@@ -11,8 +11,6 @@ export class KeysService {
 
   async create(data) {
     const existingIds = (await this.prisma.accessKey.findMany()).map(k => k.accessUrl);
-
-    // Фильтровать входные данные на наличие несуществующих ID
     const newKeys = data.filter(key => !existingIds.includes(key.accessUrl));
     return this.prisma.accessKey.createMany({ data: newKeys });
   }
@@ -21,15 +19,17 @@ export class KeysService {
     return this.prisma.accessKey.findMany()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} key`;
+  findOne(id: string) {
+    return this.prisma.accessKey.findUnique({
+      where: {
+        id
+      }
+    })
   }
 
-  update(id: number, updateKeyDto: UpdateKeyDto) {
-    return `This action updates a #${id} key`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} key`;
+  async deleteKey(id: string) {
+    await this.prisma.accessKey.delete({
+      where: { id: id }
+    });
   }
 }
