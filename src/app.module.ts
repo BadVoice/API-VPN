@@ -8,6 +8,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AccessKeysModule } from './middleware/accessKeys.module';
 import { TrackingService } from './middleware/get-vpn-keys.middleware';
 import { KeysService } from './keys/keys.service';
+import { PaymentModule } from './payment/payment.module';
+import { PaymentService } from './payment/payment.service';
 
 
 
@@ -18,9 +20,11 @@ import { KeysService } from './keys/keys.service';
     DatabaseModule,
     UserModule,
     AuthModule,
-    KeysModule
+    KeysModule,
+    PaymentModule
   ],
+  
   controllers: [],
-  providers: [TrackingService, KeysService],
+  providers: [TrackingService, KeysService, PaymentService],
 })
 export class AppModule {}

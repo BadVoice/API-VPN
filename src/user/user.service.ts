@@ -42,9 +42,11 @@ export class UserService {
           email: userDto.email,
           password: hashedPassword,
           role: userDto.role,
+          key: userDto.key,
           imgUrl: userDto.imgUrl = "default.png",
           profile: {
             create: {
+              key: userDto.key,
               lastName: userDto.lastName,
               firstName: userDto.firstName
             }

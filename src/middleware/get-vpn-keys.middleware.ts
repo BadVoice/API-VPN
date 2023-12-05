@@ -41,9 +41,9 @@ export class TrackingService {
         await Promise.all(keysToDelete.map(id => this.accessKeysService.deleteKey(id)));
       }
   
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_SECOND)
     async handleCron() {
-      this.logger.debug('Called every minute');
+      this.logger.debug('Called every second');
       await this.getAccessKeys();
     }
   }

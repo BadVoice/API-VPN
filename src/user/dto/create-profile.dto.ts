@@ -14,4 +14,8 @@ export class CreateProfileDto {
     @IsString()
     @IsOptional()
     imgUrl?: string
+
+    @IsString()
+    @IsOptional()
+    key?: string
 }
