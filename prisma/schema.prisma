@@ -23,6 +23,7 @@ model User {
   updatedAt DateTime @map("updated_at") @updatedAt
   role Role @default(USER)
   profile UserProfile?
+  products Product[]
 
   @@map("users")
 }
@@ -59,6 +60,18 @@ model Payment {
   userId String 
   status String 
   amount String  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id String @id @unique @default(uuid()) @map("product_id") @db.Uuid
+  name String @map("product_name")
+  region String @map("product_region")
+  userId String @db.Uuid
+
+  user User @relation(fields: [userId], references: [id])
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

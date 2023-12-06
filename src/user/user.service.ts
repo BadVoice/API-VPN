@@ -60,6 +60,7 @@ export class UserService {
           role: true,
           emailConfirmed: true,
           profile: true,
+          products: true,
           updatedAt: true,
           createdAt: true,
         }
@@ -96,6 +97,7 @@ export class UserService {
         imgUrl: true,
         emailConfirmed: true,
         profile: true,
+        products: true,
         updatedAt: true,
         createdAt: true,
       }})

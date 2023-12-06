@@ -4,6 +4,8 @@ import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { KeysService } from 'src/keys/keys.service';
+import { ProductService } from 'src/product/product.service';
+import { CreateProductDto } from 'src/product/dto/create-product.dto';
 const axios = require('axios').create({
     httpsAgent: new (require('https')).Agent({  
       rejectUnauthorized: false,
@@ -16,6 +18,7 @@ export class PaymentService {
   constructor(
     private prisma: DatabaseService,
     private readonly configService: ConfigService,
+    private readonly productService: ProductService,
     private readonly keyService: KeysService
     ) {}
 
@@ -55,16 +58,27 @@ export class PaymentService {
         where: { paymentId: response.data.id },
         data: {
             status: status,
-        }
+        },
     });
 
     if (status === 'succeeded') {
         try {
           const response = await axios.post(process.env.GET_KEYS_OUTLINE_URL);
-          console.log('Ключ создан успешно: ', response.data);
+          console.log('Ключ создан успешно: ', response.data)
+         
+          const dto: CreateProductDto = {
+            userId: updatedStatus.userId,
+            name: 'VPN 1 month',
+            region: 'Nitherlands'
+  
+          }
+
+          return this.productService.createProductForUser(dto);
+
         } catch(error) {
           console.log('Ошибка при создании ключа: ', error);
         }
+        
     }
 
     return updatedStatus;
@@ -98,18 +112,4 @@ export class PaymentService {
             amount: paymentData.amount,
         }
     })}
-
-    async addProductForUser(userId: string, key: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-        });
-    
-        if (!user) 
-            throw new NotFoundException(`User with id does not exist`);
-    
-        return await this.prisma.user.update({
-            where: { id: userId },
-            data: { key: key },
-        });
-    }
 }

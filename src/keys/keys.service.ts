@@ -6,7 +6,7 @@ import { DatabaseService } from 'src/database/database.service';
 @Injectable()
 export class KeysService {
   constructor(
-    private readonly prisma: DatabaseService,
+    private readonly prisma: DatabaseService
   ) {}
 
   async create(data) {

@@ -1,4 +1,5 @@
-import { IsObject, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsObject, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 
 class AmountDto {
   @IsString()
@@ -8,11 +9,16 @@ class AmountDto {
   currency: string;
 }
 
-class PaymentMethodDataDto {
+class MetadataDto {
   @IsString()
-  type: string;
-}
+  productName: string
 
+  @IsString()
+  productRegion: string
+
+  @IsUUID()
+  userId: string;
+}
 class ConfirmationDto {
   @IsString()
   type: string;
@@ -26,8 +32,10 @@ export class CreatePaymentDto {
   @IsObject()
   amount: AmountDto;
 
-  @IsObject()
-  payment_method_data: PaymentMethodDataDto;
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => MetadataDto)
+  metadata?: MetadataDto;
 
   @IsObject()
   confirmation: ConfirmationDto;

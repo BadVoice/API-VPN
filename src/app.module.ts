@@ -10,6 +10,7 @@ import { TrackingService } from './middleware/get-vpn-keys.middleware';
 import { KeysService } from './keys/keys.service';
 import { PaymentModule } from './payment/payment.module';
 import { PaymentService } from './payment/payment.service';
+import { ProductModule } from './product/product.module';
 
 
 
@@ -21,7 +22,8 @@ import { PaymentService } from './payment/payment.service';
     UserModule,
     AuthModule,
     KeysModule,
-    PaymentModule
+    PaymentModule,
+    ProductModule
   ],
   
   controllers: [],
