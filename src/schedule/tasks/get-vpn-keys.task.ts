@@ -11,12 +11,13 @@ import { ConfigService } from '@nestjs/config';
 import { KeysService } from 'src/keys/keys.service';
 
 @Injectable()
-export class TrackingService {
-    private readonly logger = new Logger(TrackingService.name);
+export class GetVpnKeysTask {
+    private readonly logger = new Logger(GetVpnKeysTask.name);
     constructor(
         private accessKeysService: KeysService,
         private configService: ConfigService) 
     {}
+    
 
     async getAccessKeys() {
       try {

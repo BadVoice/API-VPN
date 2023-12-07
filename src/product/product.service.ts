@@ -16,8 +16,14 @@ export class ProductService {
         user: {
           connect: { id: userId },
         },
-        
       },
+      select: {
+        name: true,
+        region: true,
+        id: true,
+        createdAt: true,
+        updatedAt: true
+      }
     })
     .catch(error => {
       if (error instanceof PrismaClientKnownRequestError) {

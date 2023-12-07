@@ -70,10 +70,12 @@ export class PaymentService {
             userId: updatedStatus.userId,
             name: 'VPN 1 month',
             region: 'Nitherlands'
-  
+
           }
 
-          return this.productService.createProductForUser(dto);
+          await this.productService.createProductForUser(dto);
+
+          return status
 
         } catch(error) {
           console.log('Ошибка при создании ключа: ', error);
@@ -81,7 +83,7 @@ export class PaymentService {
         
     }
 
-    return updatedStatus;
+    return status;
     }
 
   async assignKeyToUser(userId: string, keyId: string) {
