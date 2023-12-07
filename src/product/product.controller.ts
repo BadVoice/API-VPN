@@ -19,8 +19,8 @@ export class ProductController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(id);
+  findMany(@Param('id') id: string) {
+    return this.productService.findMany(id);
   }
 
   @Delete(':id')

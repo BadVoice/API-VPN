@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, NotFoundException, UseGuards } from '@nestjs/common';
 import { KeysService } from './keys.service';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { WebhookService } from 'src/webhook.service';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('keys')
+@UseGuards(RolesGuard)
 export class KeysController {
   constructor(
     private readonly keysService: KeysService,
@@ -18,7 +20,11 @@ export class KeysController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.keysService.findOne(id);
+    return this.keysService.findOne(id)
+    .then(r => {
+      if(!r) throw new NotFoundException('Key not found');
+      return r
+    });
   }
 
   @Delete(':id')
@@ -30,7 +36,7 @@ export class KeysController {
       return 'Key deleted successfully and webhook notified';
     } catch (error) {
       console.error('Failed to delete key and notify webhook:', error);
-      throw new BadRequestException('Record to delete does not exist');
+      throw new BadRequestException('Key to delete does not exist');
     }
   }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { DatabaseService } from 'src/database/database.service';
@@ -16,20 +16,37 @@ export class KeysService {
   }
 
   findAll() {
-    return this.prisma.accessKey.findMany()
+    return this.prisma.accessKey.findMany({
+      select: {
+        id: true,
+        modelId: true,
+      }
+    })
   }
 
   findOne(id: string) {
     return this.prisma.accessKey.findUnique({
       where: {
-        id
+        modelId: id
+      },
+      select: {
+        id: true,
+        modelId: true,
+        accessUrl: true
       }
     })
   }
 
   async deleteKey(id: string) {
     await this.prisma.accessKey.delete({
-      where: { id: id }
+      where: { id: id },
+      select: {
+        id: true,
+        modelId: true
+      }
+    }).then(r => {
+      if(!r) throw new NotFoundException('Key not found');
+      return r
     });
   }
 }

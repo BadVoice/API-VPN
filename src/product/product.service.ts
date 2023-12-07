@@ -33,8 +33,8 @@ export class ProductService {
     return this.prisma.product.findMany()
   }
 
-  findOne(id: string) {
-    return this.prisma.product.findUnique({ where: { id } })
+  findMany(id: string) {
+    return this.prisma.product.findMany({ where: { userId: id } })
   }
 
   remove(id: string) {
