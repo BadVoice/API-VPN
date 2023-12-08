@@ -11,6 +11,8 @@ import { KeysService } from './keys/keys.service';
 import { PaymentModule } from './payment/payment.module';
 import { PaymentService } from './payment/payment.service';
 import { ProductModule } from './product/product.module';
+
+
 import { PaymentsGateway } from './payment/payment.gateway';
 
 
@@ -28,6 +30,6 @@ import { PaymentsGateway } from './payment/payment.gateway';
   ],
   
   controllers: [],
-  providers: [TrackingService, KeysService, PaymentService, PaymentsGateway],
+  providers: [PaymentsGateway],
 })
 export class AppModule {}
