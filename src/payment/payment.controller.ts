@@ -1,7 +1,9 @@
-import { Controller, Post, Body, Put, Param, BadRequestException, Get, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, BadRequestException, Get, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentsGateway } from './payment.gateway';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller()
 export class PaymentController {
@@ -13,6 +15,7 @@ export class PaymentController {
     ) {}
 
 @Post('create-payment')
+@UseGuards(AuthGuard, RolesGuard)
 async createPayment(@Body() createPaymentDto: CreatePaymentDto ) {
     return await this.paymentService.create(createPaymentDto)
     .then(r => {
