@@ -1,10 +1,16 @@
 import { Controller, Post, Body, Put, Param, BadRequestException, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { PaymentsGateway } from './payment.gateway';
 
 @Controller()
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    
+    private readonly paymentService: PaymentService,
+    private readonly paymentsGateway: PaymentsGateway
+    
+    ) {}
 
 @Post('create-payment')
 async createPayment(@Body() createPaymentDto: CreatePaymentDto ) {
@@ -18,11 +24,12 @@ async createPayment(@Body() createPaymentDto: CreatePaymentDto ) {
 @Post('record-payment')
 async recordPayment(@Body() body: { userId: string, paymentData: { paymentId: string, status: string, amount: string }}) {
     const { userId, paymentData } = body;
-    return  await this.paymentService.recordPayment(userId, paymentData)
-    .then(r => {
-        if(!r) throw new BadRequestException('Bad request for record-payment');
-        return r
-    });  
+    await this.paymentService.recordPayment(userId, paymentData)
+    this.paymentsGateway.notifyPaymentCreated(userId, paymentData.paymentId);
+    // .then(r => {
+    //     if(!r) throw new BadRequestException('Bad request for record-payment');
+    //     return r
+    // });  
   }
 
 @Get('payments/:id/status')

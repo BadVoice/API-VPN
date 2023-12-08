@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { KeysModule } from './keys/keys.module';
 import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
+import { PaymentsGateway } from './payment/payment.gateway';
 import { ScheduleTaskModule } from './schedule/schedule.module';
 
 @Module({
@@ -21,6 +22,6 @@ import { ScheduleTaskModule } from './schedule/schedule.module';
   ],
   
   controllers: [],
-  providers: [],
+  providers: [PaymentsGateway],
 })
 export class AppModule {}

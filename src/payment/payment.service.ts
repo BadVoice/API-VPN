@@ -6,6 +6,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { KeysService } from 'src/keys/keys.service';
 import { ProductService } from 'src/product/product.service';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
+import { PaymentsGateway } from './payment.gateway';
 const axios = require('axios').create({
     httpsAgent: new (require('https')).Agent({  
       rejectUnauthorized: false,
@@ -19,7 +20,8 @@ export class PaymentService {
     private prisma: DatabaseService,
     private readonly configService: ConfigService,
     private readonly productService: ProductService,
-    private readonly keyService: KeysService
+    private readonly keyService: KeysService,
+    private readonly paymentsGateway: PaymentsGateway
     ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
@@ -106,12 +108,15 @@ export class PaymentService {
   }
 
   async recordPayment(userId: string, paymentData: { paymentId: string, status: string, amount: string }) {
-    return await this.prisma.payment.create({
+    const recordPay =  await this.prisma.payment.create({
         data: {
             paymentId: paymentData.paymentId,
             userId: userId, 
             status: paymentData.status,
             amount: paymentData.amount,
         }
-    })}
+    })
+    return recordPay
+  }
+
 }
