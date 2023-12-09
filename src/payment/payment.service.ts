@@ -7,12 +7,12 @@ import { KeysService } from 'src/keys/keys.service';
 import { ProductService } from 'src/product/product.service';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { PaymentsGateway } from './payment.gateway';
-const axios = require('axios').create({
-    httpsAgent: new (require('https')).Agent({  
-      rejectUnauthorized: false,
-    }),
-  }); // for developer version, dont forgot remove this after deploy
-
+// const axios = require('axios').create({
+//     httpsAgent: new (require('https')).Agent({  
+//       rejectUnauthorized: false,
+//     }),
+//   }); // for developer version, dont forgot remove this after deploy
+import axios from 'axios';
 
 @Injectable()
 export class PaymentService {

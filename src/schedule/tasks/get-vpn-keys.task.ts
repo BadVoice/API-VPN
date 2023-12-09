@@ -1,9 +1,9 @@
-
-const axios = require('axios').create({
-    httpsAgent: new (require('https')).Agent({  
-      rejectUnauthorized: false,
-    }),
-  }); // for developer version, dont forgot remove this after deploy
+import axios from 'axios';
+// const axios = require('axios').create({
+//     httpsAgent: new (require('https')).Agent({  
+//       rejectUnauthorized: false,
+//     }),
+//   }); // for developer version, dont forgot remove this after deploy
 
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
