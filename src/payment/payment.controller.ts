@@ -15,7 +15,6 @@ export class PaymentController {
     ) {}
 
 @Post('create-payment')
-@UseGuards(AuthGuard, RolesGuard)
 async createPayment(@Body() createPaymentDto: CreatePaymentDto ) {
     return await this.paymentService.create(createPaymentDto)
     .then(r => {
@@ -28,19 +27,22 @@ async createPayment(@Body() createPaymentDto: CreatePaymentDto ) {
 async recordPayment(@Body() body: { userId: string, paymentData: { paymentId: string, status: string, amount: string }}) {
     const { userId, paymentData } = body;
     await this.paymentService.recordPayment(userId, paymentData)
+     .then(r => {
+        if(!r) throw new BadRequestException('Bad request for record-payment');
+        return r
+    });  
     this.paymentsGateway.notifyPaymentCreated(userId, paymentData.paymentId);
-    // .then(r => {
-    //     if(!r) throw new BadRequestException('Bad request for record-payment');
-    //     return r
-    // });  
+   
   }
 
 @Get('payments/:id/status')
+@UseGuards(RolesGuard)
 async getPaymentStatus(@Param('id') id: string) {
     return await this.paymentService.getPaymentStatus(id)
 }
 
 @Get('payments')
+@UseGuards(RolesGuard)
 async getPayment() {
     return this.paymentService.findAll();
 }
