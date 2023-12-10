@@ -7,12 +7,11 @@ import { KeysService } from 'src/keys/keys.service';
 import { ProductService } from 'src/product/product.service';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { PaymentsGateway } from './payment.gateway';
-// const axios = require('axios').create({
-//     httpsAgent: new (require('https')).Agent({  
-//       rejectUnauthorized: false,
-//     }),
-//   }); // for developer version, dont forgot remove this after deploy
-import axios from 'axios';
+const axios = require('axios').create({
+    httpsAgent: new (require('https')).Agent({  
+      rejectUnauthorized: false,
+    }),
+  }); // for developer version, dont forgot remove this after deploy
 
 @Injectable()
 export class PaymentService {
@@ -48,7 +47,7 @@ export class PaymentService {
 
   async createProductAndKey(paymentId: string, status: string) {
     console.log('Статус платежа: ', status);
-
+    
     const updatedStatus = await this.prisma.payment.update({
         where: { paymentId: paymentId },
         data: {
@@ -58,7 +57,7 @@ export class PaymentService {
 
     if (status === 'succeeded') {
           const response = await axios.post(process.env.GET_KEYS_OUTLINE_URL);
-          console.log('Ключ создан успешно: ', response.data)
+          console.log('Ключ создан успешно: ', response.data.id)
          
           const dto: CreateProductDto = {
             userId: updatedStatus.userId,

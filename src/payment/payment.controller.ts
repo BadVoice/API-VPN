@@ -46,9 +46,10 @@ async recordPayment(@Body() body: { userId: string, paymentData: { paymentId: st
    
   }
 
-@Get('payments/:id/status/')
+@Post('payments/:id')
 @UseGuards(RolesGuard)
-async getPaymentStatus(@Param('id') id: string, @Body() status: string) {
+async getPaymentStatus(@Param('id') id: string) {
+  const status = 'succeeded'  // mock for test
     return await this.paymentService.createProductAndKey(id, status)
 }
 
