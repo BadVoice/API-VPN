@@ -17,7 +17,7 @@ export class PaymentsGateway implements OnGatewayConnection, OnGatewayDisconnect
     server: Server;
 
 handleConnection(client: Socket, ...args: any[]) {
-    const SECRET_KEY = 'yaTakoi';
+    const SECRET_KEY = process.env.JWT_SECRET
     
     const token = Array.isArray(client.handshake.query.token)
       ? client.handshake.query.token[0]
