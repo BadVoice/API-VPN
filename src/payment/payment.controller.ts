@@ -13,6 +13,12 @@ export class PaymentController {
     private readonly paymentsGateway: PaymentsGateway
     
     ) {}
+  
+@Post('api/yookassa-webhook')
+async handleWebhook(@Body() webhookData: any) {
+  console.log('Received YooKassa webhook:', webhookData);
+
+}
 
 @Post('create-payment')
 async createPayment(@Body() createPaymentDto: CreatePaymentDto ) {
