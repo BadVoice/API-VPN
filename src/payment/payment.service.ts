@@ -46,25 +46,17 @@ export class PaymentService {
       
   }
 
-  async getPaymentStatus(paymentId: string) {
-    const response = await axios.get('https://api.yookassa.ru/v3/payments/' + paymentId, {
-        headers: {
-            'Authorization': 'Basic ' + Buffer.from(`${process.env.SHOP_ID}:${process.env.SHOP_KEY}`).toString('base64')
-        }
-    });
-
-    const status = response.data.status;
+  async createProductAndKey(paymentId: string, status: string) {
     console.log('Статус платежа: ', status);
 
     const updatedStatus = await this.prisma.payment.update({
-        where: { paymentId: response.data.id },
+        where: { paymentId: paymentId },
         data: {
             status: status,
         },
     });
 
     if (status === 'succeeded') {
-        try {
           const response = await axios.post(process.env.GET_KEYS_OUTLINE_URL);
           console.log('Ключ создан успешно: ', response.data)
          
@@ -72,20 +64,14 @@ export class PaymentService {
             userId: updatedStatus.userId,
             name: 'VPN 1 month',
             region: 'Nitherlands'
-
           }
-
           await this.productService.createProductForUser(dto);
 
-          return status
-
-        } catch(error) {
-          console.log('Ошибка при создании ключа: ', error);
+          return { status: 'success' };
         }
-        
-    }
-
-    return status;
+        else {
+          return status
+        }
     }
 
   async assignKeyToUser(userId: string, keyId: string) {

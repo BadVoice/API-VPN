@@ -14,10 +14,15 @@ export class PaymentController {
     
     ) {}
   
-@Post('api/yookassa-webhook')
+@Post('yookassa-webhook')
 async handleWebhook(@Body() webhookData: any) {
-  console.log('Received YooKassa webhook:', webhookData);
-
+  const paymentId = webhookData.object.id; 
+  const status = webhookData.object.status; 
+  return await this.paymentService.createProductAndKey(paymentId, status)
+  .then(r => {
+    if(!r) throw new BadRequestException('Bad request for createProduct');
+    return r
+  })
 }
 
 @Post('create-payment')
@@ -41,10 +46,10 @@ async recordPayment(@Body() body: { userId: string, paymentData: { paymentId: st
    
   }
 
-@Get('payments/:id/status')
+@Get('payments/:id/status/')
 @UseGuards(RolesGuard)
-async getPaymentStatus(@Param('id') id: string) {
-    return await this.paymentService.getPaymentStatus(id)
+async getPaymentStatus(@Param('id') id: string, @Body() status: string) {
+    return await this.paymentService.createProductAndKey(id, status)
 }
 
 @Get('payments')
