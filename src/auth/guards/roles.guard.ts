@@ -28,7 +28,19 @@ export class RolesGuard implements CanActivate {
     }
     
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization.split(' ')[1];
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader) {
+      throw new UnauthorizedException('Authorization header is missing');
+    }
+
+    const parts = authHeader.split(' ');
+    
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+      throw new UnauthorizedException('Authorization header is malformed');
+    }
+    
+    const token = parts[1];
     const decodedToken = this.jwtService.verify(token);
     const userId = decodedToken.id;
 

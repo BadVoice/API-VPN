@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, BadRequestException, Get, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, BadRequestException, Get, HttpException, HttpStatus, UseGuards, ForbiddenException } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentsGateway } from './payment.gateway';
@@ -56,7 +56,7 @@ async getPaymentStatus(@Param('id') id: string) {
 @Get('payments')
 @UseGuards(RolesGuard)
 async getPayment() {
-    return this.paymentService.findAll();
+    return await this.paymentService.findAll(); 
 }
 
 }
