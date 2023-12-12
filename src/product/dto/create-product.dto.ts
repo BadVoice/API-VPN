@@ -1,4 +1,4 @@
-import { IsString, IsUUID } from "class-validator";
+import { IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateProductDto {
     @IsString()
@@ -10,4 +10,7 @@ export class CreateProductDto {
     @IsString()
     @IsUUID()
     userId: string
+
+    @IsString()
+    accessUrl?: string
 }

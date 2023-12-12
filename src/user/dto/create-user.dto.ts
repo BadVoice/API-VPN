@@ -30,10 +30,6 @@ export class CreateUserDto {
     @IsOptional()
     imgUrl?: string;
 
-    @IsString()
-    @IsOptional()
-    key?: string;
-
     @IsEnum(Role)
     @IsOptional()
     role?: Role = Role.USER;

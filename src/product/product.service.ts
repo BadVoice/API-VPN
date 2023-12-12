@@ -9,16 +9,20 @@ export class ProductService {
   constructor(private readonly prisma: DatabaseService) {}
 
   async createProductForUser(dto: CreateProductDto) {
-    const { userId, ...rest } = dto;
+    const { userId, name, accessUrl,  region } = dto;
+    
     return this.prisma.product.create({
       data: {
-        ...rest,
+        name,
+        accessUrl,
+        region,
         user: {
           connect: { id: userId },
         },
       },
       select: {
         name: true,
+        accessUrl: true,
         region: true,
         id: true,
         createdAt: true,

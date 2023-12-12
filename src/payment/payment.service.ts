@@ -47,6 +47,8 @@ export class PaymentService {
 
   async createProductAndKey(paymentId: string, status: string) {
     console.log('Статус платежа: ', status);
+    const response = await axios.post(process.env.GET_KEYS_OUTLINE_URL);
+    console.log('Ключ создан успешно: ', response.data.id)
     
     const updatedStatus = await this.prisma.payment.update({
         where: { paymentId: paymentId },
@@ -56,36 +58,28 @@ export class PaymentService {
     });
 
     if (status === 'succeeded') {
-          const response = await axios.post(process.env.GET_KEYS_OUTLINE_URL);
-          console.log('Ключ создан успешно: ', response.data.id)
+     
+    const accessKey = await this.prisma.accessKey.findFirst();
+    console.log(accessKey.id)
+
+    if (!accessKey) {
+      throw new Error('No Access Keys available');
+    }
          
-          const dto: CreateProductDto = {
-            userId: updatedStatus.userId,
-            name: 'VPN 1 month',
-            region: 'Nitherlands'
-          }
-          await this.productService.createProductForUser(dto);
-
-          return { status: 'success' };
-        }
-        else {
-          return status
-        }
+    const dto = {
+      userId: updatedStatus.userId,
+      name: 'VPN 1 month',
+      region: 'Nitherlands',
+      accessUrl: accessKey.id  // Возвращать айди ключа для тестировки пользователям, далее заменим на accessUrl 
     }
 
-  async assignKeyToUser(userId: string, keyId: string) {
-    const key = await this.keyService.findOne(keyId);
+    await this.productService.createProductForUser(dto);
 
-    if (!key) {
-      throw new Error(`Key with ID ${keyId} not found`);
+    return status;
     }
-
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        key: key.accessUrl, 
-      },
-    });
+    else {
+      return status
+    }
   }
 
   findAll() {
