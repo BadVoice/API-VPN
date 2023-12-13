@@ -20,6 +20,7 @@ export class KeysService {
       select: {
         id: true,
         modelId: true,
+        usedAt: true
       }
     })
   }

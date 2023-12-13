@@ -42,7 +42,7 @@ handleConnection(client: Socket, ...args: any[]) {
 
     } catch (error) {
       console.error('Authentication error:', error.message);
-      client.disconnect(); // В случае ошибки отключаем клиента
+      client.disconnect();
     }
   }
 

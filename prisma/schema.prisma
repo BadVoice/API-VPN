@@ -44,13 +44,15 @@ model UserProfile {
 }
 
 model AccessKey {
-  modelId String? @default(uuid()) @unique
-  id  String @unique 
+  modelId String @default(uuid()) @unique
+  id  String @unique @id
   name String
   password String
   port Int
   method String
-  accessUrl String @unique @id
+  accessUrl String @unique
+  usedAt DateTime?
+  createdAt DateTime @default(now())
 }
 
 model Payment {

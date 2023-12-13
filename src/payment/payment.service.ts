@@ -19,8 +19,6 @@ export class PaymentService {
     private prisma: DatabaseService,
     private readonly configService: ConfigService,
     private readonly productService: ProductService,
-    private readonly keyService: KeysService,
-    private readonly paymentsGateway: PaymentsGateway
     ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
@@ -56,26 +54,33 @@ export class PaymentService {
             status: status,
         },
     });
-
     if (status === 'succeeded') {
-     
-    const accessKey = await this.prisma.accessKey.findFirst();
-    console.log(accessKey.id)
+      const accessKey = await this.prisma.accessKey.findFirst({
+        where: { usedAt: null },
+        orderBy: { createdAt: 'asc' }
+      });
+  
+      if (!accessKey) {
+        throw new Error('No Access Keys available');
+      }
 
-    if (!accessKey) {
-      throw new Error('No Access Keys available');
-    }
-         
-    const dto = {
-      userId: updatedStatus.userId,
-      name: 'VPN 1 month',
-      region: 'Nitherlands',
-      accessUrl: accessKey.id  // Возвращать айди ключа для тестировки пользователям, далее заменим на accessUrl 
-    }
-
-    await this.productService.createProductForUser(dto);
-
-    return status;
+      console.log('Выданный ID ключа: ', accessKey.id);
+      
+      await this.prisma.accessKey.update({
+        where: { id: accessKey.id },
+        data: { usedAt: new Date() }
+      });
+  
+      const dto = {
+        userId: updatedStatus.userId,
+        name: 'VPN 1 month',
+        region: 'Netherlands',
+        accessUrl: accessKey.id // используется actual ID ключа для теста, далее тут будет accessUrl
+      };
+  
+      await this.productService.createProductForUser(dto);
+  
+      return status;
     }
     else {
       return status
