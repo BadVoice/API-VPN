@@ -18,6 +18,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Roles(Role.User)
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id)
     .then(r => {
@@ -27,6 +28,7 @@ export class UserController {
   }
 
   @Patch(':id')
+  @Roles(Role.User)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
@@ -50,6 +52,7 @@ export class UserController {
   }
 
   @Get('profiles/:userId')
+  @Roles(Role.User)
   getProfileByUserId(@Param('userId') userId: string) {
     return this.userService.getProfileByUserId(userId)
     .then(r => {

@@ -44,13 +44,13 @@ model UserProfile {
 }
 
 model AccessKey {
-  modelId String @id @default(uuid())  
+  modelId String? @default(uuid()) @unique
   id  String @unique 
   name String
   password String
   port Int
   method String
-  accessUrl String @unique
+  accessUrl String @unique @id
 }
 
 model Payment {
