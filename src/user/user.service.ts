@@ -7,12 +7,14 @@ import { EmailService } from 'src/email/email.service';
 import * as bcrypt from 'bcrypt';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CreateProfileDto } from './dto/create-profile.dto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: DatabaseService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
+    private readonly mailService: MailService
     ) {}
 
     async login(email: string, pass: string) {
@@ -40,7 +42,7 @@ export class UserService {
   async createUserWithProfile(userDto: CreateUserDto) {
     const randomPassword = this.generatePassword(10); 
     const hashedPassword = await this.hashedPassword(randomPassword)
-    return this.prisma.user.create({
+    const user = this.prisma.user.create({
       data: {
           email: userDto.email,
           password: hashedPassword,
@@ -68,6 +70,10 @@ export class UserService {
       }
       return error
     });
+
+    await this.mailService.sendUserCredential(userDto.email, randomPassword);
+
+    return user;
   }
 
   findAll() {
