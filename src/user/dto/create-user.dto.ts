@@ -8,27 +8,8 @@ export class CreateUserDto {
     @IsEmail()
     email: string
 
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(100)
-    firstName: string
-
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(100)
-    lastName: string
-
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(100)
-    password: string
-
     @IsBoolean()
     emailConfirmed: boolean = false
-
-    @IsString()
-    @IsOptional()
-    imgUrl?: string;
 
     @IsEnum(Role)
     @IsOptional()

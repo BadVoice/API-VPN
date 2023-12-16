@@ -13,12 +13,8 @@ datasource db {
 model User {
   id  String @id @default(uuid()) @map("id") @db.Uuid
   email String @unique 
-  key String?
-  firstName String @map("first_name") @db.VarChar(100) 
-  lastName String @map("last_name") @db.VarChar(100)
   password String @db.VarChar(255)
   emailConfirmed Boolean @map("email_confirmed") @default(false) @db.Boolean()
-  imgUrl String? @map("img_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @map("updated_at") @updatedAt
   role Role @default(USER)
@@ -37,9 +33,6 @@ model UserProfile {
   id  String @id @default(uuid()) @map("id") @db.Uuid
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  String @unique @map("user_id") @default(uuid()) @db.Uuid
-  firstName String @map("first_name") @db.VarChar(100) 
-  lastName String @map("last_name") @db.VarChar(100)
-  imgUrl String? @map("img_url")
   @@map("profiles")
 }
 

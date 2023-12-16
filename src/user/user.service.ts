@@ -32,29 +32,26 @@ export class UserService {
         return null
       }
     }
-  
+
+    private generatePassword(length: number): string {
+      return require('crypto').randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
+    }
+
   async createUserWithProfile(userDto: CreateUserDto) {
-    const hashedPassword = await this.hashedPassword(userDto.password)
+    const randomPassword = this.generatePassword(10); 
+    const hashedPassword = await this.hashedPassword(randomPassword)
     return this.prisma.user.create({
       data: {
-          firstName: userDto.firstName,
-          lastName: userDto.lastName,
           email: userDto.email,
           password: hashedPassword,
           role: userDto.role,
-          imgUrl: userDto.imgUrl = "default.png",
           profile: {
             create: {
-              lastName: userDto.lastName,
-              firstName: userDto.firstName
             }
           },
         },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
-          imgUrl: true,
           role: true,
           emailConfirmed: true,
           profile: true,
@@ -90,10 +87,7 @@ export class UserService {
       where: { id },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
         role: true,
-        imgUrl: true,
         emailConfirmed: true,
         profile: true,
         products: true,
@@ -113,16 +107,11 @@ export class UserService {
           ...userData,
           profile: {
             update: {
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              imgUrl: userData.imgUrl
             }
           }
         },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           role: true,
           emailConfirmed: true,
           profile: true,
@@ -148,8 +137,6 @@ export class UserService {
         },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
           role: true,
           emailConfirmed: true,
           profile: true,

@@ -12,7 +12,7 @@ export class AuthController {
     ) {}
 
   @Post('login')
-  login(@Body() dto: SignInDto) {
+  async login(@Body() dto: SignInDto) {
     return this.authService.signIn(dto.email, dto.password)
     .then(r => {
       if(!r) throw new NotFoundException('Failed, not found');
