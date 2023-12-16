@@ -3,15 +3,19 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: DatabaseService) {}
+  constructor(
+    private readonly prisma: DatabaseService,
+    private readonly mailService: MailService
+    ) {}
 
   async createProductForUser(dto: CreateProductDto) {
     const { userId, name, accessUrl,  region } = dto;
     
-    return this.prisma.product.create({
+    const product = await this.prisma.product.create({
       data: {
         name,
         accessUrl,
@@ -24,19 +28,24 @@ export class ProductService {
         name: true,
         accessUrl: true,
         region: true,
+        user: {
+          select: {
+            email: true
+          }
+        },
         id: true,
         createdAt: true,
         updatedAt: true
       }
     })
     .catch(error => {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new BadRequestException("User with this id already exists");
-        }
-      }
+      
       return error
     });
+
+    await this.mailService.sendProductInfo(product.user.email, accessUrl, region);
+
+    return product
   }
 
   findAll() {

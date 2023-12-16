@@ -32,4 +32,14 @@ export class MailService {
 
     await this.sendMail(recipient, subject, text);
   }
+
+  public async sendProductInfo(recipient: string, accessUrl: string, region: string) {
+    const subject = 'Привет, твой продукт был создан';
+    const text = `
+      Поздравляем! Ваши данные:
+      Access Url: ${accessUrl}
+      Region: ${region}`;
+  
+    await this.sendMail(recipient, subject, text);
+  }
 }

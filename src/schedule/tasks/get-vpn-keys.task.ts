@@ -8,6 +8,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { KeysService } from 'src/keys/keys.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class GetVpnKeysTask {
@@ -21,12 +22,26 @@ export class GetVpnKeysTask {
     async getAccessKeys() {
       try {
         const getKeysFromOutlineApi = this.configService.get('GET_KEYS_OUTLINE_URL');
-        const response = await axios.get(getKeysFromOutlineApi);
-        const processedData = processData(response.data);
-        const accessKeyDto = processedData
-  
-        await this.accessKeysService.create(accessKeyDto);
-        await this.removeOldAccessKeys(processedData);
+    
+        while (true) {
+          try {
+            const response = await axios.get(getKeysFromOutlineApi);
+            const processedData = processData(response.data);
+            const accessKeyDto = processedData;
+    
+            await this.accessKeysService.create(accessKeyDto);
+            await this.removeOldAccessKeys(processedData);
+    
+            break;  // Если ключ успешно создан, прерываем цикл
+          } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+              console.log('ID already exists, trying to create new key...');
+              continue;  // Если произошла ошибка уникальности, пытаемся создать новый ключ
+            }
+            console.error('Unexpected error:', error);  // Если это другая ошибка, выводим ее и останавливаем цикл
+            break;
+          }
+        }
       } catch (error) {
         console.error('Error while requesting data:', error);
       }

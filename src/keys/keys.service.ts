@@ -10,8 +10,8 @@ export class KeysService {
   ) {}
 
   async create(data) {
-    const existingIds = (await this.prisma.accessKey.findMany()).map(k => k.accessUrl);
-    const newKeys = data.filter(key => !existingIds.includes(key.accessUrl));
+    const existingIds = (await this.prisma.accessKey.findMany()).map(k => k.id);
+    const newKeys = data.filter(key => !existingIds.includes(key.id));
     return this.prisma.accessKey.createMany({ data: newKeys });
   }
 
