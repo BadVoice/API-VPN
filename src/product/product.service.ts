@@ -39,7 +39,11 @@ export class ProductService {
       }
     })
     .catch(error => {
-      
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new BadRequestException("User with this id already exists");
+        }
+      }
       return error
     });
 
