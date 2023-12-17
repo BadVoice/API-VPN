@@ -28,7 +28,7 @@ export class KeysService {
   findOne(id: string) {
     return this.prisma.accessKey.findUnique({
       where: {
-        modelId: id
+        id: id
       },
       select: {
         id: true,

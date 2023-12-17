@@ -32,13 +32,10 @@ export class GetVpnKeysTask {
             await this.accessKeysService.create(accessKeyDto);
             await this.removeOldAccessKeys(processedData);
     
-            break;  // Если ключ успешно создан, прерываем цикл
+            break; 
           } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
-              console.log('ID already exists, trying to create new key...');
-              continue;  // Если произошла ошибка уникальности, пытаемся создать новый ключ
-            }
-            console.error('Unexpected error:', error);  // Если это другая ошибка, выводим ее и останавливаем цикл
+           
+            console.error('Unexpected error:', error); 
             break;
           }
         }

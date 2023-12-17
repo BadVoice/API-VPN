@@ -42,4 +42,13 @@ export class MailService {
   
     await this.sendMail(recipient, subject, text);
   }
+
+  public async sendDeleteProductInfo(recipient: string, accessUrl: string) {
+    const subject = 'Здравствуйте, время вашего ключа закончилось';
+    const text = `
+      Ваш ключ был удален:
+      Access Url: ${accessUrl}
+      `
+    await this.sendMail(recipient, subject, text);
+  }
 }
