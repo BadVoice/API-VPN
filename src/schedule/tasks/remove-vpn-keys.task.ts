@@ -32,7 +32,7 @@ export class RemoveVpnKeysTask {
           },
         },
       });
-      
+
       for (const expiredKey of expiredKeys) {
 
         const products = await this.prisma.product.findMany({

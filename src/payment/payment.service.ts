@@ -45,36 +45,27 @@ export class PaymentService {
 
   async createProductAndKey(paymentId: string, status: string) {
     console.log('Статус платежа: ', status);
-    const response = await axios.post(process.env.GET_KEYS_OUTLINE_URL);
+  
+    const response = await this.createAccessKey();
     console.log('Ключ создан успешно: ', response.data.id)
     
-    const updatedStatus = await this.prisma.payment.update({
-        where: { paymentId: paymentId },
-        data: {
-            status: status,
-        },
-    });
+    const updatedStatus = await this.updatePaymentStatus(paymentId, status);
+    
     if (status === 'succeeded') {
-      const accessKey = await this.prisma.accessKey.findFirst({
-        where: { usedAt: null },
-        orderBy: { createdAt: 'asc' }
-      });
-  
+      const accessKey = await this.getUnusedAccessKey();
+    
       if (!accessKey) {
         throw new Error('No Access Keys available');
       }
-
+  
       console.log('Выданный ID ключа: ', accessKey.id);
-      
-      await this.prisma.accessKey.update({
-        where: { id: accessKey.id },
-        data: { usedAt: new Date() }
-      });
+  
+      await this.markAccessKeyAsUsed(accessKey.id);
   
       const dto = {
         userId: updatedStatus.userId,
-        name: 'VPN 1 month',
-        region: 'Netherlands',
+        name: 'VPN 1 Month', // replace на tariff plan details
+        region: 'Нидерланды', // replace на tariff plan details
         accessUrl: accessKey.id // используется actual ID ключа для теста, далее тут будет accessUrl
       };
   
@@ -82,9 +73,33 @@ export class PaymentService {
   
       return status;
     }
-    else {
-      return status
-    }
+  
+    return status
+  }
+
+  async createAccessKey() {
+    return await axios.post(process.env.GET_KEYS_OUTLINE_URL);
+  }
+  
+  async updatePaymentStatus(paymentId: string, status: string) {
+    return await this.prisma.payment.update({
+      where: { paymentId: paymentId },
+      data: { status: status },
+    });
+  }
+
+  async getUnusedAccessKey() {
+    return await this.prisma.accessKey.findFirst({
+      where: { usedAt: null },
+      orderBy: { createdAt: 'asc' }
+    });
+  }
+  
+  async markAccessKeyAsUsed(accessKeyId: string) {
+    return await this.prisma.accessKey.update({
+      where: { id: accessKeyId },
+      data: { usedAt: new Date() }
+    });
   }
 
   findAll() {

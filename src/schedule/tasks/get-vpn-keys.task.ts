@@ -18,7 +18,6 @@ export class GetVpnKeysTask {
         private configService: ConfigService) 
     {}
     
-
     async getAccessKeys() {
       try {
         const getKeysFromOutlineApi = this.configService.get('GET_KEYS_OUTLINE_URL');
